@@ -1,0 +1,48 @@
+// prisma/schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"] // Enable the new adapter system
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Tenant {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  patients  Patient[]
+  users     User[]
+  createdAt DateTime  @default(now())
+  auditLogs AuditLog[]
+}
+
+model User {
+  id       String @id @default(uuid())
+  email    String @unique
+  role     String @default("Staff")
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+}
+
+model Patient {
+  id        String  @id @default(uuid())
+  name      String
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  history   Json?
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  tenantId  String
+  userId    String
+  action    String   // e.g., "CREATE_PATIENT", "VIEW_ALL_PATIENTS"
+  resource  String   // e.g., "Patient"
+  metadata  Json?    // Store extra info like the patient ID
+  createdAt DateTime @default(now())
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id])
+}
+

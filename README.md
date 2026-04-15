@@ -1,98 +1,104 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# 🏥 Medical SaaS API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+ A high-performance, Multi-Tenant Hospital Management API built with NestJS, Prisma 7, and PostgreSQL (Supabase). This system is engineered for data isolation, allowing multiple hospitals to operate on a single infrastructure securely. 
+ ## 🚀 Key Features
+ 1. **Multi-Tenancy Architecture:** Secure data isolation using a custom **TenantInterceptor** that scopes every database query to a specific **tenantId** extracted from JWTs.
+ 
+ 2. **Type-Safe Persistence:** Leverages Prisma 7 with custom PostgreSQL adapters for robust, type-safe database interactions.
+ 
+ 3. **Advanced Filtering Engine:** A dynamic search system allowing complex queries (e.g., ?name=chizalam) without hardcoding logic.
+ 
+ 4. **Audit Logging:** Automatic tracking of critical actions (e.g., CREATE_PATIENT) to ensure healthcare compliance.
+ 
+ 5. **Global Security & RBAC:** Integrated Passport.js and JWT strategies with Role-Based Access Control.
+ 
+ 6. **Standardized Error Handling:** A global exception filter providing consistent, developer-friendly JSON error responses.
+ 
+ ## 🛠️ Technical Stack
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+| Category | Technology |
+| -------- | -------- |
+| Framework   | NestJS (node.js)   |
+| Language  | Typescript (Strict Mode)  |
+| ORM  | Prisma 7 |
+| Database  | PostgreSQL (via supabase)  |
+| AuthJWT  | Passport.js  |
+| Deployment  | Render / Docker |
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+ 
+ ## 🏗️ Architecture Overview
+ The project follows a modular NestJS architecture designed for horizontal scalability.
+ 
+ 1. **Data Isolation Logic**
 
-## Project setup
+ Instead of manually adding where: { tenantId } to every service method, we utilize a Global Interceptor.
+ 1. The AuthGuard validates the JWT and attaches the user payload to the request.
+ 2. The TenantInterceptor extracts the tenantId from the user payload.
+ 3. The Service uses this ID to scope all Prisma calls, ensuring Hospital A can never see Hospital B's data.
+ 
+ ## 🚦 Getting Started
+ Prerequisites
+ - Node.js (v20+)
+ - npm / yarn
+ - A Supabase (PostgreSQL) connection string
+ 
+ Installation
+ 1. **Clone the repo:**
 
-```bash
-$ npm install
-```
+ `git clone https://github.com/cemuchay/medical-saas-api.git
+cd medical-saas-api`
 
-## Compile and run the project
+2. **Install dependencies:**
 
-```bash
-# development
-$ npm run start
+`npm install`
 
-# watch mode
-$ npm run start:dev
+3. **Environment Setup:**
 
-# production mode
-$ npm run start:prod
-```
+Create a **.env** file in the root:
 
-## Run tests
+`DATABASE_URL="postgres://..."`
 
-```bash
-# unit tests
-$ npm run test
+`JWT_SECRET="your_secure_secret"`
 
-# e2e tests
-$ npm run test:e2e
+`DEV_MODE="true"`
 
-# test coverage
-$ npm run test:cov
-```
+`PORT=3000`
 
-## Deployment
+4. **Database Migration & Seed:**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+`npx prisma generate`
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+`npx prisma db push`
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+`npx ts-node prisma/seed.ts`
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+5. **Run the App:**
 
-## Resources
+`npm run start:dev`
 
-Check out a few resources that may come in handy when working with NestJS:
+## 📡 API Endpoints (Samples)
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
 
-## Support
+| Method | Endpoint | Description
+| -------- | -------- | -------- | 
+|**POST**|/**auth/login**|Returns a JWT containing **tenantId**.
+|**GET**|**/patients**|Fetch all patients for the authenticated hospital.
+|**GET**|**/patients?name=jo**|Search patients within the hospital context.
+| **POST**|**/patients**|Create a new patient (Automatically creates Audit Log).
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🛡️ Security & Compliance
 
-## Stay in touch
+- JWT Extraction: All sensitive data is stored in the JWT payload, reducing database round-trips for session data.
+- Input Validation: Uses class-validator and class-transformer to sanitize all incoming DTOs.
+- Audit Trails: Every "Write" operation is logged in the AuditLog table with a timestamp, actor ID, and metadata.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 👨‍💻 Author
+**Chizalam Emuchay**
 
-## License
+- Full-Stack Engineer specialized in React, TypeScript, and NestJS.
+- [Portfolio](https://chizalam.vercel.app/)
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+***
+
+###### Developed with a focus on high-availability and strict type safety.
